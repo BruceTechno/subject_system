@@ -23,7 +23,6 @@ public class CourseImpl implements CourseService {
     @Autowired
     private StudentDao studentDao;
 
-
     @Override
     public CourseResponse courseAdd(CourseRequest request) {
         String courseCode = request.getCode();
@@ -49,14 +48,13 @@ public class CourseImpl implements CourseService {
         return new CourseResponse(resCourse, "新增課程成功");
     }
 
-
     @Override
     public CourseResponse studentAdd(CourseRequest request) {//先有學生姓名、學號就好
         int studentNumber = request.getStudentNumber();
         String studentName = request.getStudentName();
 //     String studentCourseCode = request.getStudentCode()
 //        List<String>  studentCourseCodeList = request.getStudentCode();
-        if (studentNumber > 0) {
+        if (studentNumber < 0) {
             return new CourseResponse("studentNumber error");
         }
         if (!StringUtils.hasText(studentName)) {
@@ -77,12 +75,12 @@ public class CourseImpl implements CourseService {
         //request帶進來的資訊
         String courseCodeFromRequest = request.getCode();
         int studentNumber = request.getStudentNumber();
-                //依request 進來的資料 抓出course DB裡面所有課程    //與 所有可選課程 比對 看是否存在這堂課可以選
+        //依request 進來的資料 抓出course DB裡面所有課程    //與 所有可選課程 比對 看是否存在這堂課可以選
         Optional<Course> selectingCourseInfo = courseDao.findById(courseCodeFromRequest);
         if (!selectingCourseInfo.isPresent()) {
             return new CourseResponse("There is no this course ");
         }
-                    //為了抓出 學生所選上的課 (課程代碼) 以進一步做之後比對
+        //為了抓出 學生所選上的課 (課程代碼) 以進一步做之後比對
         Optional<Student> studentInfo = studentDao.findById(studentNumber);//學號、學生姓名、學生已選課程代碼、學生已選課程名稱
         if (!studentInfo.isPresent()) {
             return new CourseResponse("There is no this student ");
@@ -175,10 +173,11 @@ public class CourseImpl implements CourseService {
             return new CourseResponse("選課人數已達上限");
         }
 
-        Student resultStudent = new Student(studentNumber,studentName,studentCode.toString());
+//        Student resultStudent = new Student(studentNumber,studentName,studentCode.toString());
 //        studentDao.save()
 
 //studentDao.save  studentDao 建構方法帶進去課程代碼 課程名稱
+
 
         return null;//stuDao
     }

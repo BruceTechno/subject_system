@@ -16,7 +16,7 @@ public class Student {
     @Column(name ="name" )
     private String name;
     @Column(name = "code")
-    private List<String> code ;
+    private String code ;
 
 
 //==============================================================================================================
@@ -24,11 +24,6 @@ public class Student {
     public Student() {
     }
 
-    public Student(int number, String name, List<String> code) {
-        this.number = number;
-        this.name = name;
-        this.code = code;
-    }
 
     public Student(int number, String name) {
         this.number = number;
@@ -40,8 +35,6 @@ public class Student {
 
 
 //==============================================================================================================
-
-
 
     public int getNumber() {
         return number;
@@ -59,12 +52,5 @@ public class Student {
         this.name = name;
     }
 
-    public List<String> getCode() {
-        return code;
-    }
-
-    public void setCode(List<String> code) {
-        this.code = code;
-    }
 }
 
