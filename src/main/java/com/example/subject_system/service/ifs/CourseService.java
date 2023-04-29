@@ -11,7 +11,7 @@ public interface CourseService {    //request會用到的鮮血
     public CourseResponse studentAdd(CourseRequest request);
     public CourseResponse courseSelect(CourseRequest request);//比對 上課名稱 上課時間(for衝堂) 比學分 比有沒有選過
 
-//    public CourseResponse subjectCancel(CourseRequest request);
+    public CourseResponse CourseCancel(CourseRequest request);
 //
 //    public CourseResponse studentSubjectQuery(CourseRequest request);
 //

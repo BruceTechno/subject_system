@@ -12,12 +12,18 @@ public class CourseRequest {
     ////////////////////
     private int studentNumber ;
     private String studentName;
-    private List<String> studentCode;
+    private List<String> courseCodeList;
 //=============================================================================
 
     public CourseRequest() {
     }
-//=============================================================================
+
+    public CourseRequest(int studentNumber, String studentName, List<String> courseCodeList) {
+        this.studentNumber = studentNumber;
+        this.studentName = studentName;
+        this.courseCodeList = courseCodeList;
+    }
+    //=============================================================================
 
 
 
@@ -37,12 +43,12 @@ public class CourseRequest {
         this.studentName = studentName;
     }
 
-    public List<String> getStudentCode() {
-        return studentCode;
+    public List<String> getCourseCodeList() {
+        return courseCodeList;
     }
 
-    public void setStudentCode(List<String> studentCode) {
-        this.studentCode = studentCode;
+    public void setCourseCodeList(List<String> courseCodeList) {
+        this.courseCodeList = courseCodeList;
     }
 
     public String getCode() {

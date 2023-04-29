@@ -10,4 +10,5 @@ public class JavaDemoPracticeApplication {
 		SpringApplication.run(JavaDemoPracticeApplication.class, args);
 	}
 //service 裡的方法 dao有自訂義的方法也要寫
+
 }

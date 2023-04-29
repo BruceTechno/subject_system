@@ -24,17 +24,31 @@ public class Student {
     public Student() {
     }
 
-
-    public Student(int number, String name) {
+    public Student(int number, String name, String code) {
         this.number = number;
         this.name = name;
+        this.code = code;
     }
-    //    public Student(int studentNumber, String studentName) {
+
+    public Student(int number, String code) {
+        this.number = number;
+        this.code = code;
+    }
+
+//    public Student(int studentNumber, String studentName) {
 //
 //    }
 
 
 //==============================================================================================================
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public int getNumber() {
         return number;

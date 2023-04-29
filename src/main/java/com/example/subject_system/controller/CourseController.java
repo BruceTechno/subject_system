@@ -20,6 +20,10 @@ public class CourseController {
     public CourseResponse studentAdd(@RequestBody CourseRequest request){
         return courseService.studentAdd(request);
     }
+    @PostMapping(value = "course_select")
+    public CourseResponse courseSelect(@RequestBody CourseRequest request){
+        return courseService.courseSelect(request);
+    }
 
 
 }
