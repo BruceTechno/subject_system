@@ -1,0 +1,29 @@
+[33mcommit 9f0fb3d3c10cb70c8fadd23010422bdccf718b81[m[33m ([m[1;36mHEAD -> [m[1;32mbranch_select_course_done[m[33m, [m[1;31morigin/branch_select_course_done[m[33m)[m
+Author: Bruce <yu86923@gmail.com>
+Date:   Sun Apr 30 10:51:42 2023 +0800
+
+    select_course_done
+
+[33mcommit e26343c7ca1c8e2652f909ae880df8f2c584438b[m[33m ([m[1;31morigin/branch_0428[m[33m, [m[1;32mbranch_0428[m[33m)[m
+Author: Bruce <yu86923@gmail.com>
+Date:   Sat Apr 29 21:59:33 2023 +0800
+
+    select_course_half_done
+
+[33mcommit 17d8f8b1e3a13c7cb7dd19494579cc2bdfeceef8[m[33m ([m[1;31morigin/branch_test0426[m[33m, [m[1;32mbranch_test0426[m[33m)[m
+Author: Bruce <yu86923@gmail.com>
+Date:   Wed Apr 26 22:45:46 2023 +0800
+
+    test0426
+
+[33mcommit 271dfe22352fe923a95aa027ffd5a63941a40aaf[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: Bruce <yu86923@gmail.com>
+Date:   Wed Apr 26 21:45:39 2023 +0800
+
+    test
+
+[33mcommit cd4d7f156763711a254b2fa50dd1b1b25c664039[m
+Author: Bruce <yu86923@gmail.com>
+Date:   Wed Apr 26 21:44:02 2023 +0800
+
+    first commit

@@ -18,10 +18,19 @@ class JavaDemoPracticeApplicationTests {
 	public void courseSelectTest() {
 		List<String> list = new ArrayList<>();
 		list.add("A");
-		list.add("G");
+		list.add("D");
 //		list.add("C");
 		CourseRequest courseRequest = new CourseRequest(10003,"陳聖和3",list);
 		courseService.courseSelect(courseRequest);
+	}
+	@Test
+	public void courseCancelTest() {
+		List<String> list = new ArrayList<>();
+		list.add("A");
+		list.add("D");
+//		list.add("C");
+		CourseRequest courseRequest = new CourseRequest(10003,"陳聖和3",list);
+		courseService.courseCancel(courseRequest);
 	}
 
 }

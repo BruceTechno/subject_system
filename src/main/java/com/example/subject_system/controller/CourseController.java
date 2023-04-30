@@ -24,6 +24,10 @@ public class CourseController {
     public CourseResponse courseSelect(@RequestBody CourseRequest request){
         return courseService.courseSelect(request);
     }
+    @PostMapping(value = "course_cancel")
+    public CourseResponse courseCancel(@RequestBody CourseRequest request){
+        return courseService.courseCancel(request);
+    }
 
 
 }

@@ -173,6 +173,10 @@ public class CourseImpl implements CourseService {
 
             Student result = new Student(studentNumber, resultCourseCode);
             studentDao.save(result);
+            for (Course item : selectingCourseInfo) {
+                item.setNumberOfStudent(item.getNumberOfStudent() + 1);
+            }
+            courseDao.saveAll(selectingCourseInfo);
             //比對    1.要選的課程名稱不能(與學生資料庫內的課程名稱)相同
             //比對    2.不能衝堂 (時間) (課程時間)VS(學生資料庫內時間)
             //比對    3.學分總數不能超過10(學生資料庫) // student DB 多一個學分欄位???????????????????
@@ -184,16 +188,55 @@ public class CourseImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse CourseCancel(CourseRequest request) {
+    public CourseResponse courseCancel(CourseRequest request) {
         //學生代碼 選課代碼近來
         //1.學生根本沒選課 學生選課代碼為空>>無法退選 因為沒選課
         /*2.學生沒選這門課  學生資料表內沒這個代碼>> 無法退選 因為沒選課
           3.學生有這門課 學生自料表內String拿出來 變成list 之後list Contain 慾退選之list
         * */
+        int studentNumber = request.getStudentNumber();
+        List<String> cancelingCodeList = request.getCourseCodeList();
+        Optional<Student> studentInfo = studentDao.findById(studentNumber);
+        if (!studentInfo.isPresent()){
+            return new CourseResponse("學生不存在");
+        }
+        String selectedCourseCode = studentInfo.get().getCode();
+        if (!StringUtils.hasText(selectedCourseCode)){
+            return new CourseResponse("尚未選課 無法退選");
+        }
+//-------------------------------------------
+        if (StringUtils.hasText(selectedCourseCode)){
+            String[] strList = selectedCourseCode.split(",");
+            List<String> selectedCourseCodeList = new ArrayList<>(Arrays.asList(strList));
 
+            List<String> canceledCodeList = new ArrayList<>();
+            List<String> lastSelectedCodeList = new ArrayList<>();
+            for (int i = 0 ; i < cancelingCodeList.size() ; i++){
+                for (int j = 0 ; j < selectedCourseCodeList.size() ; j++){
+                    if (cancelingCodeList.get(i).equals(selectedCourseCodeList.get(j)) ){  //退A,B,C  有B,C,D
+                        canceledCodeList.add(selectedCourseCodeList.get(j));              //存B C
+                        selectedCourseCodeList.remove(j);
+                    }
+                }
+            }
+            //問題1 輸入要退的這些課 已選課清單都沒有
+            //問題2 輸入要退的這些課 包含沒選過的課
+            if (canceledCodeList.size() == 0){
+                return new CourseResponse("這些課你都沒選 無法退選");
+            }
+
+            String resultCourseCode = String.join(",", selectedCourseCodeList);
+            Student result = new Student(studentNumber,resultCourseCode);
+            studentDao.save(result);
+            List<Course> canceledCourseInfo = courseDao.findAllById(canceledCodeList);
+            for (Course item : canceledCourseInfo){
+                item.setNumberOfStudent(item.getNumberOfStudent()-1);
+            }
+        courseDao.saveAll(canceledCourseInfo);
+        }
         //學生表 學生課程代碼減少
         //課程表 選修人數減少
-        return null;
+        return new CourseResponse("退選成功");
     }
 }
 /*
