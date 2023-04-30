@@ -100,23 +100,27 @@ public class CourseImpl implements CourseService {
 
         //如果此學生完全沒選過課的話 課程代碼為空 //直接對 selectingCourseCodeList 做檢查================================
         if (!StringUtils.hasText(selectedCourseCode)) {
-
+            int selectingCreditSum = 0;
             for (int i = 0; i < selectingCourseInfo.size(); i++) {//0 ; 3  = 0 1 2
                 if (selectingCourseInfo.get(i).getNumberOfStudent() >= 3) {
                     return new CourseResponse("修課人數已滿");
+                }
+                selectingCreditSum += selectingCourseInfo.get(i).getCredit();
+                if (selectingCreditSum > 10 ){
+                    return new CourseResponse("credit over 10");
                 }
                 for (int j = i + 1; j < selectingCourseInfo.size(); j++) {
                     if (selectingCourseInfo.get(i).getName().equals(selectingCourseInfo.get(j).getName())) {
                         return new CourseResponse("選課清單內有相同名稱課程");
                     }
-                    if (selectingCourseInfo.get(i).getDay().equals(selectingCourseInfo.get(j).getName())) {
+                    if (selectingCourseInfo.get(i).getDay().equals(selectingCourseInfo.get(j).getDay())) {
                         if (!(selectingCourseInfo.get(i).getEndTime() <= selectingCourseInfo.get(j).getStartTime()
                                 || selectingCourseInfo.get(i).getStartTime() >= selectingCourseInfo.get(j).getEndTime())) {
                             return new CourseResponse("衝堂");
                         }
                     }
-
                 }
+
             }
             String resultCourseCodeForEmpty = String.join(",", selectingCourseCodeList);
             Student resultForEmpty = new Student(studentNumber, resultCourseCodeForEmpty);
@@ -181,7 +185,11 @@ public class CourseImpl implements CourseService {
 
     @Override
     public CourseResponse CourseCancel(CourseRequest request) {
-        //
+        //學生代碼 選課代碼近來
+        //1.學生根本沒選課 學生選課代碼為空>>無法退選 因為沒選課
+        /*2.學生沒選這門課  學生資料表內沒這個代碼>> 無法退選 因為沒選課
+          3.學生有這門課 學生自料表內String拿出來 變成list 之後list Contain 慾退選之list
+        * */
 
         //學生表 學生課程代碼減少
         //課程表 選修人數減少

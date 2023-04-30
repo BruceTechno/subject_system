@@ -18,8 +18,8 @@ class JavaDemoPracticeApplicationTests {
 	public void courseSelectTest() {
 		List<String> list = new ArrayList<>();
 		list.add("A");
-		list.add("B");
-		list.add("C");
+		list.add("G");
+//		list.add("C");
 		CourseRequest courseRequest = new CourseRequest(10003,"陳聖和3",list);
 		courseService.courseSelect(courseRequest);
 	}
