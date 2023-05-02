@@ -7,6 +7,7 @@ import com.example.subject_system.repository.StudentDao;
 import com.example.subject_system.service.ifs.CourseService;
 import com.example.subject_system.vo.CourseRequest;
 import com.example.subject_system.vo.CourseResponse;
+import com.example.subject_system.vo.StudentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.data.util.Streamable;
@@ -106,7 +107,7 @@ public class CourseImpl implements CourseService {
                     return new CourseResponse("修課人數已滿");
                 }
                 selectingCreditSum += selectingCourseInfo.get(i).getCredit();
-                if (selectingCreditSum > 10 ){
+                if (selectingCreditSum > 10) {
                     return new CourseResponse("credit over 10");
                 }
                 for (int j = i + 1; j < selectingCourseInfo.size(); j++) {
@@ -197,23 +198,23 @@ public class CourseImpl implements CourseService {
         int studentNumber = request.getStudentNumber();
         List<String> cancelingCodeList = request.getCourseCodeList();
         Optional<Student> studentInfo = studentDao.findById(studentNumber);
-        if (!studentInfo.isPresent()){
+        if (!studentInfo.isPresent()) {
             return new CourseResponse("學生不存在");
         }
         String selectedCourseCode = studentInfo.get().getCode();
-        if (!StringUtils.hasText(selectedCourseCode)){
+        if (!StringUtils.hasText(selectedCourseCode)) {
             return new CourseResponse("尚未選課 無法退選");
         }
 //-------------------------------------------
-        if (StringUtils.hasText(selectedCourseCode)){
+        if (StringUtils.hasText(selectedCourseCode)) {
             String[] strList = selectedCourseCode.split(",");
             List<String> selectedCourseCodeList = new ArrayList<>(Arrays.asList(strList));
 
             List<String> canceledCodeList = new ArrayList<>();
             List<String> lastSelectedCodeList = new ArrayList<>();
-            for (int i = 0 ; i < cancelingCodeList.size() ; i++){
-                for (int j = 0 ; j < selectedCourseCodeList.size() ; j++){
-                    if (cancelingCodeList.get(i).equals(selectedCourseCodeList.get(j)) ){  //退A,B,C  有B,C,D
+            for (int i = 0; i < cancelingCodeList.size(); i++) {
+                for (int j = 0; j < selectedCourseCodeList.size(); j++) {
+                    if (cancelingCodeList.get(i).equals(selectedCourseCodeList.get(j))) {  //退A,B,C  有B,C,D
                         canceledCodeList.add(selectedCourseCodeList.get(j));              //存B C
                         selectedCourseCodeList.remove(j);
                     }
@@ -221,22 +222,32 @@ public class CourseImpl implements CourseService {
             }
             //問題1 輸入要退的這些課 已選課清單都沒有
             //問題2 輸入要退的這些課 包含沒選過的課
-            if (canceledCodeList.size() == 0){
+            if (canceledCodeList.size() == 0) {
                 return new CourseResponse("這些課你都沒選 無法退選");
             }
 
             String resultCourseCode = String.join(",", selectedCourseCodeList);
-            Student result = new Student(studentNumber,resultCourseCode);
+            Student result = new Student(studentNumber, resultCourseCode);
             studentDao.save(result);
             List<Course> canceledCourseInfo = courseDao.findAllById(canceledCodeList);
-            for (Course item : canceledCourseInfo){
-                item.setNumberOfStudent(item.getNumberOfStudent()-1);
+            for (Course item : canceledCourseInfo) {
+                item.setNumberOfStudent(item.getNumberOfStudent() - 1);
             }
-        courseDao.saveAll(canceledCourseInfo);
+            courseDao.saveAll(canceledCourseInfo);
         }
         //學生表 學生課程代碼減少
         //課程表 選修人數減少
         return new CourseResponse("退選成功");
+    }
+
+    @Override
+    public CourseResponse studentCourseQuery(CourseRequest request) {
+        //輸入學生學號 撈出 課程代碼 ,依學號查詢，顯示學號、姓名、課程代碼、課程名稱、上課星期幾、上課開始時間、上課結束時間、學分
+        //課程代碼去撈出課程 然後把資訊都秀出來
+        int studentNumber = request.getStudentNumber();
+
+        List<StudentResponse> result = studentDao.searchByStudentNumber(studentNumber);
+        return new CourseResponse(result);
     }
 }
 /*

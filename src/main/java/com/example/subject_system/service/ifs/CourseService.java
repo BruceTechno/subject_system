@@ -13,7 +13,7 @@ public interface CourseService {    //request會用到的鮮血
 
     public CourseResponse courseCancel(CourseRequest request);
 //
-//    public CourseResponse studentSubjectQuery(CourseRequest request);
+    public CourseResponse studentCourseQuery(CourseRequest request);
 //
 //    public CourseResponse allSubjectQuery(CourseRequest request);
 

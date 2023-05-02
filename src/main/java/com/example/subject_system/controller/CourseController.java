@@ -3,6 +3,7 @@ package com.example.subject_system.controller;
 import com.example.subject_system.service.ifs.CourseService;
 import com.example.subject_system.vo.CourseRequest;
 import com.example.subject_system.vo.CourseResponse;
+import com.example.subject_system.vo.StudentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,9 @@ public class CourseController {
     public CourseResponse courseCancel(@RequestBody CourseRequest request){
         return courseService.courseCancel(request);
     }
-
+    @PostMapping(value = "find_by_id")
+    public CourseResponse studentCourseQuery (@RequestBody CourseRequest request){
+        return courseService.studentCourseQuery(request);
+    }
 
 }
