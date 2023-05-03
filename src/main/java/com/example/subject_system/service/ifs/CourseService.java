@@ -14,6 +14,8 @@ public interface CourseService {    //request會用到的鮮血
     public CourseResponse courseCancel(CourseRequest request);
 //
     public CourseResponse studentCourseQuery(CourseRequest request);
+    public CourseResponse getCourseInfoByCode(String courseCode);
+    public CourseResponse getCourseInfoByCourseName(CourseRequest request);
 //
 //    public CourseResponse allSubjectQuery(CourseRequest request);
 

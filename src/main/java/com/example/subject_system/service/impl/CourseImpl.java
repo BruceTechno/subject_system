@@ -1,5 +1,6 @@
 package com.example.subject_system.service.impl;
 
+import com.example.subject_system.constants.RtnCode;
 import com.example.subject_system.entity.Course;
 import com.example.subject_system.entity.Student;
 import com.example.subject_system.repository.CourseDao;
@@ -36,19 +37,19 @@ public class CourseImpl implements CourseService {
         int courseCredit = request.getCredit();
 
         if (!StringUtils.hasText(courseCode) || !StringUtils.hasText(courseName) || !StringUtils.hasText(courseDay)) {
-            return new CourseResponse("Error String ");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
         if (courseStartTime < 0 || courseEndTime < 0 || courseCredit < 0) {
-            return new CourseResponse("Error int");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
         if (courseDao.existsById(courseCode)) {
-            return new CourseResponse("course already exist");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"course already exist"
         }
         Course resCourse = new Course(courseCode, courseName, courseDay, courseStartTime, courseEndTime, courseCredit);
         courseDao.save(resCourse);
 
 
-        return new CourseResponse(resCourse, "新增課程成功");
+        return new CourseResponse(resCourse, RtnCode.SUCCESSFUL.getMessage());
     }
 
     @Override
@@ -58,19 +59,19 @@ public class CourseImpl implements CourseService {
 //     String studentCourseCode = request.getStudentCode()
 //        List<String>  studentCourseCodeList = request.getStudentCode();
         if (studentNumber < 0) {
-            return new CourseResponse("studentNumber error");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
         if (!StringUtils.hasText(studentName)) {
-            return new CourseResponse("student name ");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
 
         if (studentDao.existsById(studentNumber)) {
-            return new CourseResponse("student already exist");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"student already exist"
         }
         Student result = new Student(studentNumber, studentName);
         studentDao.save(result);
 
-        return new CourseResponse(result, "學生新增成功");
+        return new CourseResponse(result,RtnCode.SUCCESSFUL.getMessage());
     }
 
     @Override
@@ -82,18 +83,18 @@ public class CourseImpl implements CourseService {
 //        String studentNae = request.getStudentName();//欲選課之學生姓名
         List<String> selectingCourseCodeList = request.getCourseCodeList();// request輸入 要選的課 [A,B,C]
         if (studentNumber < 0) {
-            return new CourseResponse("學號輸入錯誤");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
 //        if (!StringUtils.hasText(studentName)){
 //            return new CourseResponse("學生姓名為空");
 //        }
         if (CollectionUtils.isEmpty(selectingCourseCodeList)) {
-            return new CourseResponse("輸入要選的課程List為空");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
         //欲選之課  的資訊
         List<Course> selectingCourseInfo = courseDao.findAllById(selectingCourseCodeList);//把該學生欲選之課 所有資訊撈出來
         if (CollectionUtils.isEmpty(selectingCourseInfo)) {
-            return new CourseResponse("課程表內沒有你輸入的這些課程");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"課程表內沒有你輸入的這些課程"
         }
         //欲選課之學生資訊
         Optional<Student> studentInfo = studentDao.findById(studentNumber);
@@ -104,20 +105,20 @@ public class CourseImpl implements CourseService {
             int selectingCreditSum = 0;
             for (int i = 0; i < selectingCourseInfo.size(); i++) {//0 ; 3  = 0 1 2
                 if (selectingCourseInfo.get(i).getNumberOfStudent() >= 3) {
-                    return new CourseResponse("修課人數已滿");
+                    return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"修課人數已滿"
                 }
                 selectingCreditSum += selectingCourseInfo.get(i).getCredit();
                 if (selectingCreditSum > 10) {
-                    return new CourseResponse("credit over 10");
+                    return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"credit over 10"
                 }
                 for (int j = i + 1; j < selectingCourseInfo.size(); j++) {
                     if (selectingCourseInfo.get(i).getName().equals(selectingCourseInfo.get(j).getName())) {
-                        return new CourseResponse("選課清單內有相同名稱課程");
+                        return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"選課清單內有相同名稱課程"
                     }
                     if (selectingCourseInfo.get(i).getDay().equals(selectingCourseInfo.get(j).getDay())) {
                         if (!(selectingCourseInfo.get(i).getEndTime() <= selectingCourseInfo.get(j).getStartTime()
                                 || selectingCourseInfo.get(i).getStartTime() >= selectingCourseInfo.get(j).getEndTime())) {
-                            return new CourseResponse("衝堂");
+                            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//衝堂
                         }
                     }
                 }
@@ -141,23 +142,23 @@ public class CourseImpl implements CourseService {
             int selectingCreditSum = 0;
             for (Course selecting : selectingCourseInfo) {//選 A.B.C
                 if (selectedCourseCodeList.contains(selecting.getCode())) {
-                    return new CourseResponse("選課代碼重複 這門課妳已經有了");
+                    return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"選課代碼重複 這門課妳已經有了"
                 }
                 if (selecting.getNumberOfStudent() >= 3) {
-                    return new CourseResponse("修課人數已滿");
+                    return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"修課人數已滿"
                 }
 
                 for (Course selected : selectedCourseInfo) {//有C.D.E -- 1,1,1
                     //名稱 衝堂
                     if (selected.getName().equals(selecting.getName())) {
-                        return new CourseResponse("課程名稱重複");
+                        return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"課程名稱重複"
                     }
                     if (selecting.getDay().equals(selected.getDay())) {
                         if (selecting.getEndTime() <= selected.getStartTime() //欲選的開始時間大於已選的結束時間 或 欲選的結束時間小於已選的開始時間 才不衝堂
                                 || selecting.getStartTime() >= selected.getEndTime()) {//850 <= 900    900 >= 850
                             continue;
                         }
-                        return new CourseResponse("衝堂");
+                        return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//衝堂
                     }
                 }
                 selectingCreditSum += selecting.getCredit();
@@ -168,7 +169,7 @@ public class CourseImpl implements CourseService {
                 selectedCreditSum += item.getCredit();
             }
             if (selectedCreditSum + selectingCreditSum > 10) {
-                return new CourseResponse("修習總學分數超過10");
+                return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"修習總學分數超過10"
             }
             String resultCourseCode = String.join(",", selectedCourseCodeList);
 
@@ -184,7 +185,7 @@ public class CourseImpl implements CourseService {
             //比對    4.未選上的才可以選 拿輸入的courseCode 跟 學生資料庫裏面的 exist by --> 直接find by 找的到就後續處理 找不到就
             //比對    5.每門課只能三位學生 //course再多一個欄位 for 人數?????????????????????????????????????????
         }
-        return new CourseResponse("選課成功");
+        return new CourseResponse(RtnCode.SUCCESSFUL.getMessage());
 
     }
 
@@ -199,11 +200,11 @@ public class CourseImpl implements CourseService {
         List<String> cancelingCodeList = request.getCourseCodeList();
         Optional<Student> studentInfo = studentDao.findById(studentNumber);
         if (!studentInfo.isPresent()) {
-            return new CourseResponse("學生不存在");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"學生不存在"
         }
         String selectedCourseCode = studentInfo.get().getCode();
         if (!StringUtils.hasText(selectedCourseCode)) {
-            return new CourseResponse("尚未選課 無法退選");
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"尚未選課 無法退選"
         }
 //-------------------------------------------
         if (StringUtils.hasText(selectedCourseCode)) {
@@ -223,7 +224,7 @@ public class CourseImpl implements CourseService {
             //問題1 輸入要退的這些課 已選課清單都沒有
             //問題2 輸入要退的這些課 包含沒選過的課
             if (canceledCodeList.size() == 0) {
-                return new CourseResponse("這些課你都沒選 無法退選");
+                return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"這些課你都沒選 無法退選"
             }
 
             String resultCourseCode = String.join(",", selectedCourseCodeList);
@@ -237,7 +238,7 @@ public class CourseImpl implements CourseService {
         }
         //學生表 學生課程代碼減少
         //課程表 選修人數減少
-        return new CourseResponse("退選成功");
+        return new CourseResponse(RtnCode.SUCCESSFUL.getMessage());
     }
 
     @Override
@@ -245,9 +246,38 @@ public class CourseImpl implements CourseService {
         //輸入學生學號 撈出 課程代碼 ,依學號查詢，顯示學號、姓名、課程代碼、課程名稱、上課星期幾、上課開始時間、上課結束時間、學分
         //課程代碼去撈出課程 然後把資訊都秀出來
         int studentNumber = request.getStudentNumber();
-
+        if (studentNumber < 0){
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+        }
         List<StudentResponse> result = studentDao.searchByStudentNumber(studentNumber);
+        if (CollectionUtils.isEmpty(result)){
+            return new CourseResponse(RtnCode.NOT_FOUND.getMessage());
+        }
         return new CourseResponse(result);
+    }
+    public CourseResponse getCourseInfoByCode (String code){
+    if (!StringUtils.hasText(code)){
+        return new CourseResponse(RtnCode.CANNOT_EMPTY.getMessage());
+    }
+        Optional<Course> courseInfo = courseDao.findById(code);
+    if (!courseInfo.isPresent()){
+        return new CourseResponse(RtnCode.NOT_FOUND.getMessage());
+    }
+        return new CourseResponse(courseInfo.get(),RtnCode.SUCCESSFUL.getMessage());
+    }
+
+    @Override
+    public CourseResponse getCourseInfoByCourseName(CourseRequest request) {
+        String courseName = request.getName();
+        if (!StringUtils.hasText(courseName)){
+            return new CourseResponse(RtnCode.CANNOT_EMPTY.getMessage());
+        }
+        List<Course> courseInfo = courseDao.findByName(courseName);
+        if (CollectionUtils.isEmpty(courseInfo)){
+            return new CourseResponse(RtnCode.CANNOT_EMPTY.getMessage());
+        }
+
+        return new CourseResponse(courseInfo,RtnCode.SUCCESSFUL.getMessage());
     }
 }
 /*

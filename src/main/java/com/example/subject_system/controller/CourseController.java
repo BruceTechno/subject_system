@@ -33,5 +33,12 @@ public class CourseController {
     public CourseResponse studentCourseQuery (@RequestBody CourseRequest request){
         return courseService.studentCourseQuery(request);
     }
-
+    @PostMapping(value = "get_course_info_by_code")
+    public CourseResponse getCourseInfoByCode(@RequestBody CourseRequest request){
+        return courseService.getCourseInfoByCode(request.getCode());
+    }
+    @PostMapping(value = "get_course_info_by_name")
+    public CourseResponse getCourseInfoByCourseName(@RequestBody CourseRequest request){
+        return courseService.getCourseInfoByCourseName(request);
+    }
 }

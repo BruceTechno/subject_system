@@ -2,8 +2,8 @@ package com.example.subject_system.constants;
 
 public enum RtnCode {
     SUCCESSFUL("200","Successful!!"),
-    CANNOT_EMPTY("400","Account or password is empty!!!"),
-    DATA_ERROR("400","Account or password is error!!!"),
+    CANNOT_EMPTY("400","Data is empty!!!"),
+    DATA_ERROR("400","Data is error!!!"),
     NOT_FOUND("404","Not found!!!");
     private String code;
     private String message;
