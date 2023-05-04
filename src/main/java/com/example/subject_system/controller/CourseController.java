@@ -41,4 +41,12 @@ public class CourseController {
     public CourseResponse getCourseInfoByCourseName(@RequestBody CourseRequest request){
         return courseService.getCourseInfoByCourseName(request);
     }
+    @PostMapping(value = "student_delete")
+    public CourseResponse studentDelete(@RequestBody CourseRequest request){
+        return courseService.studentDelete(request);
+    }
+    @PostMapping(value = "course_delete")
+    public CourseResponse courseDelete(@RequestBody CourseRequest request){
+        return courseService.courseDelete(request);
+    }
 }

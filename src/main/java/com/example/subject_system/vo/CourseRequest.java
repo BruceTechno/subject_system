@@ -18,6 +18,21 @@ public class CourseRequest {
     public CourseRequest() {
     }
 
+    public CourseRequest(int studentNumber, String studentName) {
+        this.studentNumber = studentNumber;
+        this.studentName = studentName;
+    }
+
+    public CourseRequest(String code, String name, String day, int startTime, int endTime, int credit, int studentNumber) {
+        this.code = code;
+        this.name = name;
+        this.day = day;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.credit = credit;
+        this.studentNumber = studentNumber;
+    }
+
     public CourseRequest(int studentNumber, String studentName, List<String> courseCodeList) {
         this.studentNumber = studentNumber;
         this.studentName = studentName;

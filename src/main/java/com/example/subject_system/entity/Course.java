@@ -38,6 +38,16 @@ public class Course {
         this.endTime = endTime;
         this.credit = credit;
     }
+
+    public Course(String code, String name, String day, int startTime, int endTime, int credit, int numberOfStudent) {
+        this.code = code;
+        this.name = name;
+        this.day = day;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.credit = credit;
+        this.numberOfStudent = numberOfStudent;
+    }
     //====================================================================================================
 
     public int getNumberOfStudent() {

@@ -37,13 +37,13 @@ public class CourseImpl implements CourseService {
         int courseCredit = request.getCredit();
 
         if (!StringUtils.hasText(courseCode) || !StringUtils.hasText(courseName) || !StringUtils.hasText(courseDay)) {
-            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+            return new CourseResponse(RtnCode.CANNOT_EMPTY.getMessage());
         }
         if (courseStartTime < 0 || courseEndTime < 0 || courseCredit < 0) {
-            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+            return new CourseResponse(RtnCode.CANNOT_EMPTY.getMessage());
         }
         if (courseDao.existsById(courseCode)) {
-            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"course already exist"
+            return new CourseResponse(RtnCode.CANNOT_EMPTY.getMessage());//"course already exist"
         }
         Course resCourse = new Course(courseCode, courseName, courseDay, courseStartTime, courseEndTime, courseCredit);
         courseDao.save(resCourse);
@@ -53,7 +53,7 @@ public class CourseImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse studentAdd(CourseRequest request) {//先有學生姓名、學號就好
+    public CourseResponse studentAdd(CourseRequest request) {
         int studentNumber = request.getStudentNumber();
         String studentName = request.getStudentName();
 //     String studentCourseCode = request.getStudentCode()
@@ -75,20 +75,17 @@ public class CourseImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse courseSelect(CourseRequest request) {//List 選課代碼 帶進來 拆成一堂一堂加?
-        //欲選之課 的資訊
-        //已選的課 的資訊
-
+    public CourseResponse courseSelect(CourseRequest request) {//List 選課代碼 帶進來
         int studentNumber = request.getStudentNumber();//欲選課之學生學號
-//        String studentNae = request.getStudentName();//欲選課之學生姓名
         List<String> selectingCourseCodeList = request.getCourseCodeList();// request輸入 要選的課 [A,B,C]
+        String studentName = request.getStudentName();
         if (studentNumber < 0) {
             return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
-//        if (!StringUtils.hasText(studentName)){
-//            return new CourseResponse("學生姓名為空");
-//        }
         if (CollectionUtils.isEmpty(selectingCourseCodeList)) {
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+        }
+        if (!StringUtils.hasText(studentName)){
             return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
         }
         //欲選之課  的資訊
@@ -98,34 +95,36 @@ public class CourseImpl implements CourseService {
         }
         //欲選課之學生資訊
         Optional<Student> studentInfo = studentDao.findById(studentNumber);
+        if (!studentInfo.isPresent()){
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//資料庫內沒這個學生
+        }
         String selectedCourseCode = studentInfo.get().getCode();
 
         //如果此學生完全沒選過課的話 課程代碼為空 //直接對 selectingCourseCodeList 做檢查================================
         if (!StringUtils.hasText(selectedCourseCode)) {
             int selectingCreditSum = 0;
-            for (int i = 0; i < selectingCourseInfo.size(); i++) {//0 ; 3  = 0 1 2
-                if (selectingCourseInfo.get(i).getNumberOfStudent() >= 3) {
+            for (int i = 0; i < selectingCourseInfo.size(); i++) {//用兩個迴圈檢查進來的多筆選課資料 0vs1 1vs2 2vs3...
+                if (selectingCourseInfo.get(i).getNumberOfStudent() >= 3) {//檢查每一節課的選課人數
                     return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"修課人數已滿"
                 }
-                selectingCreditSum += selectingCourseInfo.get(i).getCredit();
+                selectingCreditSum += selectingCourseInfo.get(i).getCredit();//把每一個欲選課的學分累加
                 if (selectingCreditSum > 10) {
                     return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"credit over 10"
                 }
                 for (int j = i + 1; j < selectingCourseInfo.size(); j++) {
-                    if (selectingCourseInfo.get(i).getName().equals(selectingCourseInfo.get(j).getName())) {
+                    if (selectingCourseInfo.get(i).getName().equals(selectingCourseInfo.get(j).getName())) {//0vs1 1vs2 2vs3
                         return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"選課清單內有相同名稱課程"
-                    }
-                    if (selectingCourseInfo.get(i).getDay().equals(selectingCourseInfo.get(j).getDay())) {
+                    }//比對要選的這一堆課程內名稱有無相同的
+                    if (selectingCourseInfo.get(i).getDay().equals(selectingCourseInfo.get(j).getDay())) {//如果星期一樣
                         if (!(selectingCourseInfo.get(i).getEndTime() <= selectingCourseInfo.get(j).getStartTime()
                                 || selectingCourseInfo.get(i).getStartTime() >= selectingCourseInfo.get(j).getEndTime())) {
                             return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//衝堂
-                        }
+                        }//比對衝堂時間
                     }
                 }
-
-            }
+            }//"A,D"
             String resultCourseCodeForEmpty = String.join(",", selectingCourseCodeList);
-            Student resultForEmpty = new Student(studentNumber, resultCourseCodeForEmpty);
+            Student resultForEmpty = new Student(studentNumber, studentName,resultCourseCodeForEmpty);
             studentDao.save(resultForEmpty);
             for (Course item : selectingCourseInfo) {
                 item.setNumberOfStudent(item.getNumberOfStudent() + 1);
@@ -134,11 +133,12 @@ public class CourseImpl implements CourseService {
         }
 ////---------------------------------------------------   如果此學生完全沒選過課的話 課程代碼為空 以上
         if (StringUtils.hasText(selectedCourseCode)) {
-
-            String[] strList = selectedCourseCode.split(",");//把
+//selectedCourseCode  A,D>>"A,D"
+            String[] strList = selectedCourseCode.split(",");//把學生代碼string轉 陣列  //strList[A,D]
             List<String> selectedCourseCodeList = new ArrayList<>(Arrays.asList(strList));
             //已選上課程之資訊
             List<Course> selectedCourseInfo = courseDao.findAllById(selectedCourseCodeList);//A、B、C課程的內容資訊
+            System.out.println(selectedCourseCodeList.get(0));
             int selectingCreditSum = 0;
             for (Course selecting : selectingCourseInfo) {//選 A.B.C
                 if (selectedCourseCodeList.contains(selecting.getCode())) {
@@ -188,7 +188,6 @@ public class CourseImpl implements CourseService {
         return new CourseResponse(RtnCode.SUCCESSFUL.getMessage());
 
     }
-
     @Override
     public CourseResponse courseCancel(CourseRequest request) {
         //學生代碼 選課代碼近來
@@ -208,14 +207,13 @@ public class CourseImpl implements CourseService {
         }
 //-------------------------------------------
         if (StringUtils.hasText(selectedCourseCode)) {
-            String[] strList = selectedCourseCode.split(",");
-            List<String> selectedCourseCodeList = new ArrayList<>(Arrays.asList(strList));
+            String[] strList = selectedCourseCode.split(",");//String to List
+            List<String> selectedCourseCodeList = new ArrayList<>(Arrays.asList(strList));//String to List
 
             List<String> canceledCodeList = new ArrayList<>();
-            List<String> lastSelectedCodeList = new ArrayList<>();
             for (int i = 0; i < cancelingCodeList.size(); i++) {
                 for (int j = 0; j < selectedCourseCodeList.size(); j++) {
-                    if (cancelingCodeList.get(i).equals(selectedCourseCodeList.get(j))) {  //退A,B,C  有B,C,D
+                    if (cancelingCodeList.get(i).equals(selectedCourseCodeList.get(j))) { //退A,B,C 有B,C,D >兩個list內一樣的刪
                         canceledCodeList.add(selectedCourseCodeList.get(j));              //存B C
                         selectedCourseCodeList.remove(j);
                     }
@@ -223,11 +221,11 @@ public class CourseImpl implements CourseService {
             }
             //問題1 輸入要退的這些課 已選課清單都沒有
             //問題2 輸入要退的這些課 包含沒選過的課
-            if (canceledCodeList.size() == 0) {
+            if (canceledCodeList.size() == 0) {//要退選的課程list 跟 已選課程的list 沒有相同的內容
                 return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//"這些課你都沒選 無法退選"
             }
 
-            String resultCourseCode = String.join(",", selectedCourseCodeList);
+            String resultCourseCode = String.join(",", selectedCourseCodeList);//List to String
             Student result = new Student(studentNumber, resultCourseCode);
             studentDao.save(result);
             List<Course> canceledCourseInfo = courseDao.findAllById(canceledCodeList);
@@ -278,6 +276,54 @@ public class CourseImpl implements CourseService {
         }
 
         return new CourseResponse(courseInfo,RtnCode.SUCCESSFUL.getMessage());
+    }
+
+    @Override
+    public CourseResponse studentDelete(CourseRequest request) {
+//1.如果學生沒有選課 >> 直接刪
+//2.如果有選課     >> 進到課程DB 把選課人數調整 之後 再刪掉
+        int studentNumber = request.getStudentNumber();
+        if (studentNumber < 0){
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+        }
+        Optional<Student> studentInfo = studentDao.findById(studentNumber);
+        if (!studentInfo.isPresent()){
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+        }
+        String selectedCode = studentInfo.get().getCode();
+        if (!StringUtils.hasText(selectedCode)){//如果學生代碼沒東西是空的
+            studentDao.delete(studentInfo.get());
+        }
+        //如果還有選課的話
+        String[]  strList = selectedCode.split(",");
+        List<String> selectedCodeList = new ArrayList<>(Arrays.asList(strList));
+        List<Course> selectedCourseInfo = courseDao.findAllById(selectedCodeList);
+        for (Course item : selectedCourseInfo){
+            item.setNumberOfStudent(item.getNumberOfStudent()-1);
+        }
+        courseDao.saveAll(selectedCourseInfo);
+        studentDao.deleteById(studentNumber);
+
+        return new CourseResponse(RtnCode.SUCCESSFUL.getMessage());
+    }
+
+    @Override
+    public CourseResponse courseDelete(CourseRequest request) {
+        String ingCode = request.getCode();
+        if (!StringUtils.hasText(ingCode)){
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());
+        }
+        Optional<Course> ingCourseInfo = courseDao.findById(ingCode);
+        if (!ingCourseInfo.isPresent()){
+            return new CourseResponse(RtnCode.NOT_FOUND.getMessage());
+        }
+        if (ingCourseInfo.get().getNumberOfStudent() == 0){
+            courseDao.deleteById(ingCode);
+        }
+        if (ingCourseInfo.get().getNumberOfStudent() > 1 ){
+            return new CourseResponse(RtnCode.DATA_ERROR.getMessage());//還有人選課無法退選
+        }
+        return new CourseResponse(RtnCode.SUCCESSFUL.getMessage());
     }
 }
 /*
