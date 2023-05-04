@@ -74,8 +74,17 @@ class JavaDemoPracticeApplicationTests {
         list.add("A");
         list.add("D");
 //		list.add("C");
+
         CourseRequest courseRequest = new CourseRequest(10003, "陳聖和3", list);
         courseService.courseCancel(courseRequest);
     }
-
+    @Test
+    public void courseCancelTest2() {
+        String str = "A,B,C";
+        System.out.println(str.contains("A"));
+        if (str.contains("A")){
+            str = str.replace("A,","");
+        }
+        System.out.println(str);
+    }
 }
