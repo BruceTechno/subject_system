@@ -5,6 +5,7 @@ public enum RtnCode {
     CANNOT_EMPTY("400","Data is empty!!!"),
     DATA_ERROR("400","Data is error!!!"),
     NOT_FOUND("404","Not found!!!");
+
     private String code;
     private String message;
 //=======================================================================================

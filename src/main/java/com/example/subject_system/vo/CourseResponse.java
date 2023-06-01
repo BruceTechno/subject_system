@@ -2,30 +2,21 @@ package com.example.subject_system.vo;
 
 import com.example.subject_system.entity.Course;
 import com.example.subject_system.entity.Student;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class CourseResponse {
     private Course course;
     private Student student;
     private String message ;
-    private List<Course> courseList;
-    private List<StudentResponse> studentResponse;
+    private List<?> studentResponse;
 //============================================================================================
 
 
-    public CourseResponse(List<StudentResponse> studentResponse) {
-        this.studentResponse = studentResponse;
-    }
-
     public CourseResponse() {
     }
-
-    public CourseResponse(String message, List<StudentResponse> studentResponse) {
-        this.message = message;
-        this.studentResponse = studentResponse;
-    }
-
     public CourseResponse(Student student, String message) {
         this.student = student;
         this.message = message;
@@ -36,16 +27,37 @@ public class CourseResponse {
         this.message = message;
     }
 
-    public CourseResponse(List<Course> courseList,String message ) {
+    public CourseResponse(List<?> studentResponse, String message) {
         this.message = message;
-        this.courseList = courseList;
+        this.studentResponse = studentResponse;
     }
 
     public CourseResponse(String message) {
         this.message = message;
     }
 
+    public CourseResponse(List<?> studentResponse) {
+        this.studentResponse = studentResponse;
+    }
+
     //====================================================================================================================
+
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
 
     public String getMessage() {
         return message;
@@ -55,11 +67,11 @@ public class CourseResponse {
         this.message = message;
     }
 
-    public List<StudentResponse> getStudentResponse() {
+    public List<?> getStudentResponse() {
         return studentResponse;
     }
 
-    public void setStudentResponse(List<StudentResponse> studentResponse) {
+    public void setStudentResponse(List<?> studentResponse) {
         this.studentResponse = studentResponse;
     }
 }

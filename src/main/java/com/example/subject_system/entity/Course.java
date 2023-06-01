@@ -1,5 +1,8 @@
 package com.example.subject_system.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -7,6 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "class")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Course {
 
     @Id

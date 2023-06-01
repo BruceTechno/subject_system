@@ -15,9 +15,9 @@ import java.util.List;
 public interface StudentDao extends JpaRepository<Student,Integer> {
     @Transactional
     @Modifying
-    @Query("select new com.example.subject_system.vo.StudentResponse(s.number,s.name,c.code,c.name,c.day,c.startTime,c.endTime,c.credit)" +
+    @Query("select new com.example.subject_system.vo.StudentResponse(s.number,s.name,c.code,c.name,c.day,c.startTime,c.endTime,c.credit,c.numberOfStudent)" +
             " from Course c join Student s on s.code" +
             " Like concat('%',c.code,'%')" +
-            " where s.number = :newNumber ")
+            " where s.number = :newNumber")
     public List<StudentResponse> searchByStudentNumber(@Param("newNumber")int newNumber);
 }

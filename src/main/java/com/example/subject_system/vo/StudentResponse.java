@@ -9,11 +9,13 @@ public class StudentResponse {
     private int startTime;
     private int endTime;
     private int credit;
-//================================================================================================
+    private int numberOfStudent;
+
+    //================================================================================================
     public StudentResponse() {
     }
 
-    public StudentResponse(int sNumber, String sName, String courseCode, String courseName, String day, int startTime, int endTime, int credit) {
+    public StudentResponse(int sNumber, String sName, String courseCode, String courseName, String day, int startTime, int endTime, int credit, int numberOfStudent) {
         this.sNumber = sNumber;
         this.sName = sName;
         this.courseCode = courseCode;
@@ -22,7 +24,10 @@ public class StudentResponse {
         this.startTime = startTime;
         this.endTime = endTime;
         this.credit = credit;
+        this.numberOfStudent = numberOfStudent;
     }
+
+
     //   ==========================================================================================
 
     public int getCredit() {
@@ -87,5 +92,13 @@ public class StudentResponse {
 
     public void setEndTime(int endTime) {
         this.endTime = endTime;
+    }
+
+    public int getNumberOfStudent() {
+        return numberOfStudent;
+    }
+
+    public void setNumberOfStudent(int numberOfStudent) {
+        this.numberOfStudent = numberOfStudent;
     }
 }
